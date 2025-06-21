@@ -1,36 +1,35 @@
 const express = require("express");
-const app = express();
-const http = require("http").createServer(app);
-const io = require("socket.io")(http);
+const http = require("http");
 const path = require("path");
+const { Server } = require("socket.io");
 
-const PORT = process.env.PORT || 3000;
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+const rooms = {}; // roomId: [socketId1, socketId2]
 
 app.use(express.static(path.join(__dirname, "public")));
 
-const rooms = {}; // roomName → [socket1, socket2]
-
 io.on("connection", (socket) => {
-    console.log("User connected:", socket.id);
+    console.log("Client connected:", socket.id);
 
     socket.on("create", (room) => {
         rooms[room] = [socket.id];
         socket.join(room);
-        socket.emit("start", "X"); // creator is X
+        socket.emit("start", "X");
     });
 
     socket.on("join", (room) => {
-        if (!rooms[room]) {
-            rooms[room] = [socket.id];
-            socket.join(room);
-            socket.emit("start", "X");
-        } else if (rooms[room].length === 1) {
+        if (rooms[room] && rooms[room].length === 1) {
             rooms[room].push(socket.id);
             socket.join(room);
-            socket.emit("start", "O"); // second player is O
-            io.to(rooms[room][0]).emit("start", "X"); // ensure first player gets confirmation too
+
+            // Inform both players of their symbols
+            socket.emit("start", "O");
+            io.to(rooms[room][0]).emit("start", "X");
         } else {
-            socket.emit("full");
+            socket.emit("error", "Raum nicht verfügbar oder voll.");
         }
     });
 
@@ -39,20 +38,21 @@ io.on("connection", (socket) => {
     });
 
     socket.on("restart", (room) => {
-        socket.to(room).emit("restart");
+        io.to(room).emit("restart");
     });
 
     socket.on("disconnect", () => {
-        for (let room in rooms) {
+        for (const room in rooms) {
             rooms[room] = rooms[room].filter(id => id !== socket.id);
             if (rooms[room].length === 0) {
                 delete rooms[room];
             }
         }
-        console.log("User disconnected:", socket.id);
+        console.log("Client disconnected:", socket.id);
     });
 });
 
-http.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`✅ Server läuft auf http://localhost:${PORT}`);
 });
