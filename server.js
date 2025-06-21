@@ -1,67 +1,66 @@
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+
 const app = express();
-const http = require("http").createServer(app);
-const io = require("socket.io")(http);
-const path = require("path");
+const server = http.createServer(app);
+const io = new Server(server);
 
-const PORT = process.env.PORT || 3000;
+const rooms = {}; // speichert Spieler pro Raum
 
-app.use(express.static(path.join(__dirname, "public")));
+// Static-Files (z. B. HTML, CSS, JS)
+app.use(express.static(__dirname + "/public")); // Stelle sicher, dass index.html dort liegt
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-// Räume und Spieler-Tracking
-const rooms = {};
-
+// WebSocket-Verbindung
 io.on("connection", (socket) => {
-  console.log("Ein Spieler verbunden:", socket.id);
+  console.log("✅ Neuer Client verbunden:", socket.id);
 
   socket.on("joinRoom", (room) => {
+    console.log(`📥 ${socket.id} möchte Raum ${room} beitreten`);
+
+    // Raum initialisieren
     if (!rooms[room]) {
       rooms[room] = [];
     }
 
+    // Wenn Raum voll → Abbruch
     if (rooms[room].length >= 2) {
-      socket.emit("roomFull");
+      socket.emit("error", "Der Raum ist voll.");
       return;
     }
 
-    rooms[room].push(socket);
+    // Socket zum Raum hinzufügen
+    rooms[room].push(socket.id);
     socket.join(room);
 
-    const playerSymbol = rooms[room].length === 1 ? "X" : "O";
-    socket.emit("start", playerSymbol);
+    const playerIndex = rooms[room].indexOf(socket.id);
+    const symbol = playerIndex === 0 ? "X" : "O";
+    socket.emit("start", symbol);
 
-    if (rooms[room].length === 2) {
-      // Wenn beide Spieler verbunden sind, startet das Spiel
-      io.to(room).emit("status", "Spiel gestartet");
-    }
+    console.log(`🎮 ${socket.id} spielt als ${symbol} im Raum ${room}`);
+  });
 
-    // Weiterleiten von Spielzügen
-    socket.on("move", ({ index, symbol }) => {
-      socket.to(room).emit("move", { index, symbol });
-    });
+  socket.on("move", ({ room, index, symbol }) => {
+    socket.to(room).emit("move", { index, symbol });
+  });
 
-    // Restart weiterleiten
-    socket.on("restart", () => {
-      socket.to(room).emit("restart");
-    });
+  socket.on("restart", (room) => {
+    io.to(room).emit("restart");
+  });
 
-    // Aufräumen bei Trennung
-    socket.on("disconnect", () => {
-      console.log("Spieler getrennt:", socket.id);
-      if (rooms[room]) {
-        rooms[room] = rooms[room].filter((s) => s !== socket);
-        if (rooms[room].length === 0) {
-          delete rooms[room];
-        }
+  socket.on("disconnect", () => {
+    for (const room in rooms) {
+      rooms[room] = rooms[room].filter((id) => id !== socket.id);
+      if (rooms[room].length === 0) {
+        delete rooms[room];
       }
-    });
+    }
+    console.log("❌ Verbindung getrennt:", socket.id);
   });
 });
 
-http.listen(PORT, () => {
-  console.log(`Server läuft auf http://localhost:${PORT}`);
+// Server starten
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`🚀 Server läuft auf http://localhost:${PORT}`);
 });
