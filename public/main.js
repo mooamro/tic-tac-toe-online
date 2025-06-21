@@ -1,66 +1,82 @@
 const socket = io();
+
 let mySymbol = "";
 let currentTurn = "X";
-const board = Array(9).fill("");
+let board = Array(9).fill("");
+let room = "";
+
 const cells = document.querySelectorAll(".cell");
 const statusEl = document.getElementById("status");
+const restartBtn = document.getElementById("restartBtn");
+const joinBtn = document.getElementById("joinBtn");
+const createBtn = document.getElementById("createBtn");
+const roomInput = document.getElementById("roomInput");
 
-document.getElementById("restartBtn").addEventListener("click", () => {
-  socket.emit("restart", room);
-});
+// Spielfeld aktualisieren
+function updateBoard() {
+  board.forEach((symbol, i) => {
+    cells[i].innerText = symbol;
+  });
+}
 
-cells.forEach((cell, index) => {
+// Spielerwechsel
+function switchTurn() {
+  currentTurn = currentTurn === "X" ? "O" : "X";
+}
+
+// Klick auf Zelle
+cells.forEach((cell, i) => {
   cell.addEventListener("click", () => {
-    if (board[index] === "" && currentTurn === mySymbol) {
-      board[index] = mySymbol;
+    if (board[i] === "" && currentTurn === mySymbol) {
+      board[i] = mySymbol;
       updateBoard();
-      socket.emit("move", { room, index, symbol: mySymbol });
+      socket.emit("move", { room, index: i, symbol: mySymbol });
       switchTurn();
     }
   });
 });
 
-function updateBoard() {
-  cells.forEach((cell, i) => {
-    cell.textContent = board[i];
-  });
-}
-
-function switchTurn() {
-  currentTurn = currentTurn === "X" ? "O" : "X";
-}
-
-let room = "";
-
-// UI Buttons
-document.getElementById("createBtn").addEventListener("click", () => {
-  room = Math.random().toString(36).substr(2, 5);
-  socket.emit("create", room);
-  statusEl.textContent = `Raum erstellt: ${room}`;
+// Restart-Klick
+restartBtn.addEventListener("click", () => {
+  board = Array(9).fill("");
+  updateBoard();
+  currentTurn = "X";
+  socket.emit("restart", room);
 });
 
-document.getElementById("joinBtn").addEventListener("click", () => {
-  room = document.getElementById("roomInput").value.trim();
-  if (room) {
-    socket.emit("join", room);
+// Raum beitreten
+joinBtn.addEventListener("click", () => {
+  const roomCode = roomInput.value.trim();
+  if (roomCode) {
+    room = roomCode;
+    socket.emit("joinRoom", room);
   }
 });
 
-// Socket.IO Events
-socket.on("start", (symbol) => {
-  mySymbol = symbol;
-  statusEl.textContent = `Du spielst: ${mySymbol}`;
+// Neues Spiel erstellen
+createBtn.addEventListener("click", () => {
+  room = Math.random().toString(36).substring(2, 8).toUpperCase();
+  roomInput.value = room;
+  socket.emit("joinRoom", room);
 });
 
+// Socket.IO: Starte Spiel
+socket.on("start", (symbol) => {
+  mySymbol = symbol;
+  statusEl.innerText = `Du spielst: ${mySymbol}`;
+});
+
+// Socket.IO: Gegnerzug erhalten
 socket.on("move", ({ index, symbol }) => {
   board[index] = symbol;
   updateBoard();
   switchTurn();
 });
 
+// Socket.IO: Spiel zurückgesetzt
 socket.on("restart", () => {
-  board.fill("");
+  board = Array(9).fill("");
   updateBoard();
   currentTurn = "X";
-  statusEl.textContent = `Du spielst: ${mySymbol}`;
+  statusEl.innerText = `Du spielst: ${mySymbol}`;
 });
