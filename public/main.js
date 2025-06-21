@@ -13,71 +13,73 @@ const joinBtn = document.getElementById("joinBtn");
 const createBtn = document.getElementById("createBtn");
 const roomInput = document.getElementById("roomInput");
 
-// --------- SPIELFUNKTIONEN ---------
-
+// Spielfeld aktualisieren
 function updateBoard() {
   board.forEach((symbol, i) => {
     cells[i].innerText = symbol;
+    cells[i].classList.remove("x", "o");
+    if (symbol === "X") cells[i].classList.add("x");
+    if (symbol === "O") cells[i].classList.add("o");
   });
 }
 
+// Spielerwechsel
 function switchTurn() {
   currentTurn = currentTurn === "X" ? "O" : "X";
-  if (!gameOver) {
-    statusEl.innerText = currentTurn === mySymbol ? "Dein Zug" : "Warten auf Gegner...";
-  }
 }
 
+// Gewinner prüfen
 function checkWinner() {
-  const winCombos = [
-    [0,1,2], [3,4,5], [6,7,8],
-    [0,3,6], [1,4,7], [2,5,8],
-    [0,4,8], [2,4,6]
+  const winPatterns = [
+    [0,1,2], [3,4,5], [6,7,8], // Reihen
+    [0,3,6], [1,4,7], [2,5,8], // Spalten
+    [0,4,8], [2,4,6]           // Diagonalen
   ];
 
-  for (let combo of winCombos) {
-    const [a, b, c] = combo;
+  for (let pattern of winPatterns) {
+    const [a, b, c] = pattern;
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      // Markiere Gewinnerzellen
-      combo.forEach(i => cells[i].classList.add("win"));
-      return board[a]; // X oder O
+      return board[a]; // "X" oder "O"
     }
   }
 
-  if (board.every(cell => cell !== "")) {
+  if (board.every(cell => cell)) {
     return "draw";
   }
 
   return null;
 }
 
+// Spiel beenden
+function handleEnd(result) {
+  gameOver = true;
+  if (result === "draw") {
+    statusEl.innerText = "Unentschieden!";
+  } else {
+    statusEl.innerText = `${result} hat gewonnen!`;
+  }
+}
 
-// --------- EVENTS ---------
-
+// Klick auf Zelle
 cells.forEach((cell, i) => {
   cell.addEventListener("click", () => {
-    if (board[i] === "" && currentTurn === mySymbol && !gameOver) {
+    if (gameOver) return;
+    if (board[i] === "" && currentTurn === mySymbol) {
       board[i] = mySymbol;
       updateBoard();
       socket.emit("move", { room, index: i, symbol: mySymbol });
 
       const result = checkWinner();
       if (result) {
-        gameOver = true;
-        if (result === "draw") {
-          statusEl.innerText = "Unentschieden!";
-        } else {
-          statusEl.innerText = `${result} hat gewonnen!`;
-        }
-        socket.emit("gameOver", { room, result });
-        return;
+        handleEnd(result);
+      } else {
+        switchTurn();
       }
-
-      switchTurn();
     }
   });
 });
 
+// Restart-Klick
 restartBtn.addEventListener("click", () => {
   board = Array(9).fill("");
   updateBoard();
@@ -87,8 +89,7 @@ restartBtn.addEventListener("click", () => {
   socket.emit("restart", room);
 });
 
-// --------- RAUM ---------
-
+// Raum beitreten
 joinBtn.addEventListener("click", () => {
   const roomCode = roomInput.value.trim();
   if (roomCode) {
@@ -97,50 +98,37 @@ joinBtn.addEventListener("click", () => {
   }
 });
 
+// Neues Spiel erstellen
 createBtn.addEventListener("click", () => {
   room = Math.random().toString(36).substring(2, 8).toUpperCase();
   roomInput.value = room;
   socket.emit("joinRoom", room);
 });
 
-// --------- SOCKET.IO ---------
-
+// Spielstart vom Server
 socket.on("start", (symbol) => {
   mySymbol = symbol;
-  statusEl.innerText = `Du spielst: ${mySymbol}`;
+  statusEl.innerText = `Du spielst: ${mySymbol}. Warte auf Gegner...`;
 });
 
+// Gegnerzug
 socket.on("move", ({ index, symbol }) => {
   board[index] = symbol;
   updateBoard();
 
   const result = checkWinner();
   if (result) {
-    gameOver = true;
-    if (result === "draw") {
-      statusEl.innerText = "Unentschieden!";
-    } else {
-      statusEl.innerText = `${result} hat gewonnen!`;
-    }
-    return;
+    handleEnd(result);
+  } else {
+    switchTurn();
   }
-
-  switchTurn();
 });
 
+// Spiel zurückgesetzt
 socket.on("restart", () => {
   board = Array(9).fill("");
   updateBoard();
   currentTurn = "X";
   gameOver = false;
   statusEl.innerText = `Du spielst: ${mySymbol}`;
-});
-
-socket.on("gameOver", ({ result }) => {
-  gameOver = true;
-  if (result === "draw") {
-    statusEl.innerText = "Unentschieden!";
-  } else {
-    statusEl.innerText = `${result} hat gewonnen!`;
-  }
 });
