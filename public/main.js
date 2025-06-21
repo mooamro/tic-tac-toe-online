@@ -1,3 +1,5 @@
+console.log("main.js wurde geladen ✅");
+
 const socket = io();
 
 let mySymbol = "";
