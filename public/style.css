@@ -72,3 +72,12 @@ h1 {
   color: #777;
   font-style: italic;
 }
+.cell.win-x {
+  background-color: black;
+  color: white;
+}
+
+.cell.win-o {
+  background-color: red;
+  color: white;
+}
