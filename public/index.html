@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Sketch XO Online</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<h1>Sketch XO Online</h1>
+
+<div id="home" class="active">
+    <button id="createGame">🎮 Create Game</button>
+    <br />
+    <input id="roomInput" placeholder="Enter room code" />
+    <br />
+    <button id="joinGame">🔗 Join Game</button>
+</div>
+
+<div id="game">
+    <div id="status">Waiting...</div>
+    <div id="link-display"></div>
+    <div id="board"></div>
+    <button id="restartBtn">🔁 Restart</button>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

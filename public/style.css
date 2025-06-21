@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+
+body {
+    margin: 0;
+    font-family: 'Permanent Marker', cursive;
+    background-color: #fefefe;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+#home, #game {
+    display: none;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+#home.active, #game.active {
+    display: block;
+}
+
+button {
+    background-color: black;
+    color: white;
+    font-size: 18px;
+    padding: 12px 24px;
+    margin: 10px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Permanent Marker', cursive;
+}
+
+button:hover {
+    background-color: #444;
+}
+
+input[type="text"] {
+    font-size: 18px;
+    padding: 10px;
+    margin-top: 10px;
+    border: 2px solid black;
+    font-family: 'Permanent Marker', cursive;
+    width: 80%;
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 5px;
+    margin-top: 20px;
+    background: black;
+}
+
+.cell {
+    width: 100px;
+    height: 100px;
+    background-color: white;
+    font-size: 72px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    border: none;
+    font-family: 'Permanent Marker', cursive;
+}
+
+.cell:hover {
+    background-color: #f0f0f0;
+}
+
+#status {
+    font-size: 24px;
+    margin-top: 15px;
+}
+
+#link-display {
+    font-size: 16px;
+    margin-top: 10px;
+    word-break: break-word;
+}
