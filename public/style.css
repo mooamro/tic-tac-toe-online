@@ -1,91 +1,80 @@
-@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
-
 body {
-    margin: 0;
-    font-family: 'Permanent Marker', cursive;
-    background-color: #fefefe;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    color: #1e2a78; /* Hier änderst du die Schriftfarbe */
-}
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #f0f4f8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
 }
 
 h1 {
-    font-size: 36px;
-    margin-bottom: 10px;
-}
-
-#home, #game {
-    display: none;
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-}
-
-#home.active, #game.active {
-    display: block;
-}
-
-button {
-    background-color: black;
-    color: white;
-    font-size: 18px;
-    padding: 12px 24px;
-    margin: 10px;
-    border: none;
-    cursor: pointer;
-    font-family: 'Permanent Marker', cursive;
-}
-
-button:hover {
-    background-color: #444;
-}
-
-input[type="text"] {
-    font-size: 18px;
-    padding: 10px;
-    margin-top: 10px;
-    border: 2px solid black;
-    font-family: 'Permanent Marker', cursive;
-    width: 80%;
-}
-
-#board {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 5px;
-    margin-top: 20px;
-    background: black;
-}
-
-.cell {
-    width: 100px;
-    height: 100px;
-    background-color: white;
-    font-size: 72px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    user-select: none;
-    border: none;
-    font-family: 'Permanent Marker', cursive;
-}
-
-.cell:hover {
-    background-color: #f0f0f0;
+  margin-top: 10px;
+  font-size: 2.5rem;
+  color: #333;
 }
 
 #status {
-    font-size: 24px;
-    margin-top: 15px;
+  margin: 15px 0;
+  font-size: 1.2rem;
+  color: #444;
 }
 
-#link-display {
-    font-size: 16px;
-    margin-top: 10px;
-    word-break: break-word;
+#board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
+  gap: 5px;
+  margin-bottom: 20px;
+  touch-action: manipulation; /* besseres Touch-Verhalten */
+}
+
+.cell {
+  background-color: #fff;
+  border: 2px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.cell:hover {
+  background-color: #e6f7ff;
+}
+
+.cell:active {
+  background-color: #d0ebff;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #4caf50;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+@media (max-width: 500px) {
+  #board {
+    grid-template-columns: repeat(3, 80px);
+    grid-template-rows: repeat(3, 80px);
+  }
+
+  .cell {
+    font-size: 2rem;
+  }
+
+  button {
+    font-size: 0.9rem;
+  }
 }
