@@ -1,4 +1,13 @@
 body {
+  background-image: url('palestine-flag_121354613.jpg');
+  background-size: cover;         /* scales to cover the screen */
+  background-position: center;    /* keeps it centered */
+  background-repeat: no-repeat;   /* no tiling */
+}
+
+
+
+body {
   margin: 0;
   font-family: 'Arial', sans-serif;
   background-color: #f0f4f8;
