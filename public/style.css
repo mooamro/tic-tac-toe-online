@@ -8,6 +8,8 @@ body {
     flex-direction: column;
     align-items: center;
     padding: 20px;
+    color: #1e2a78; /* Hier änderst du die Schriftfarbe */
+}
 }
 
 h1 {
