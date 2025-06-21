@@ -47,6 +47,7 @@ function checkWinner() {
   return null;
 }
 
+// Nur Ergänzung zu vorher:
 function handleEnd(result) {
   gameOver = true;
 
@@ -54,9 +55,9 @@ function handleEnd(result) {
     statusEl.innerText = "Unentschieden!";
   } else {
     statusEl.innerText = `${result.winner} hat gewonnen!`;
-    // Gewinnlinie einfärben
     result.line.forEach(index => {
-      cells[index].classList.add(result.winner === "X" ? "win-x" : "win-o");
+      const cell = cells[index];
+      cell.classList.add(result.winner === "X" ? "win-x" : "win-o");
     });
   }
 }
