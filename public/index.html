@@ -7,23 +7,16 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
   <h1>Tic Tac Toe Online</h1>
 
-  <!-- Home Screen: Raumcode eingeben oder neues Spiel starten -->
-  <div id="home">
+  <div id="controls">
     <input id="roomInput" placeholder="Raumcode eingeben" />
-    <button id="joinGame">Beitreten</button>
-    <button id="createGame">Neues Spiel erstellen</button>
+    <button id="joinBtn">Beitreten</button>
+    <button id="createBtn">Neues Spiel erstellen</button>
   </div>
 
-  <!-- Anzeige des Raumcodes -->
-  <p id="link-display"></p>
-
-  <!-- Spielstatus -->
   <div id="status">Warte auf Verbindung...</div>
 
-  <!-- Spielfeld -->
   <div id="board">
     <div class="cell" data-index="0"></div>
     <div class="cell" data-index="1"></div>
@@ -36,10 +29,8 @@
     <div class="cell" data-index="8"></div>
   </div>
 
-  <!-- Neustart-Button -->
   <button id="restartBtn">Neustarten</button>
 
-  <!-- Socket.IO und Main Script -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="main.js"></script>
 </body>
