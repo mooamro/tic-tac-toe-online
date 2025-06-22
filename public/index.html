@@ -1,12 +1,3 @@
-<div class="background-animation">
-  <div class="xo xo1">X</div>
-  <div class="xo xo2">O</div>
-  <div class="xo xo3">X</div>
-  <div class="xo xo4">O</div>
-  <div class="xo xo5">X</div>
-</div>
-
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -16,16 +7,31 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+  <!-- Background X/O Animation -->
+  <div class="background-animation" id="xo-background">
+    <!-- Dynamically filled by JavaScript (optional) -->
+    <span style="left: 10%; animation-delay: 0s;">X</span>
+    <span style="left: 30%; animation-delay: 2s;">O</span>
+    <span style="left: 50%; animation-delay: 4s;">X</span>
+    <span style="left: 70%; animation-delay: 1s;">O</span>
+    <span style="left: 90%; animation-delay: 3s;">X</span>
+  </div>
+
+  <!-- Game Title -->
   <h1>Tic Tac Toe Online</h1>
 
+  <!-- Join/Create Controls -->
   <div id="controls">
     <input id="roomInput" placeholder="Raumcode eingeben" />
     <button id="joinBtn">Beitreten</button>
     <button id="createBtn">Neues Spiel erstellen</button>
   </div>
 
+  <!-- Status Message -->
   <div id="status">Warte auf Verbindung...</div>
 
+  <!-- Game Board -->
   <div id="board">
     <div class="cell" data-index="0"></div>
     <div class="cell" data-index="1"></div>
@@ -38,9 +44,15 @@
     <div class="cell" data-index="8"></div>
   </div>
 
+  <!-- Restart Button -->
   <button id="restartBtn">Neustarten</button>
 
+  <!-- Optional Room Link -->
+  <div id="link-display"></div>
+
+  <!-- Socket.IO and Game Script -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="main.js"></script>
+
 </body>
 </html>
