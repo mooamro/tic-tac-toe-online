@@ -4,6 +4,7 @@ let mySymbol = "";
 let currentTurn = "X";
 let board = Array(9).fill("");
 let room = "";
+let isVsAI = false;
 
 const cells = document.querySelectorAll(".cell");
 const statusEl = document.getElementById("status");
@@ -11,68 +12,73 @@ const restartBtn = document.getElementById("restartBtn");
 const joinBtn = document.getElementById("joinBtn");
 const createBtn = document.getElementById("createBtn");
 const roomInput = document.getElementById("roomInput");
+const vsAiBtn = document.getElementById("vsAiBtn");
 
-// Spielfeld aktualisieren
 function updateBoard() {
   board.forEach((symbol, i) => {
     cells[i].innerText = symbol;
-    cells[i].classList.remove("x", "o", "win-x", "win-o");
-
-    if (symbol === "X") cells[i].classList.add("x");
-    if (symbol === "O") cells[i].classList.add("o");
+    cells[i].className = `cell ${symbol.toLowerCase()}`;
   });
 }
 
-// Spielerwechsel
 function switchTurn() {
   currentTurn = currentTurn === "X" ? "O" : "X";
+  if (isVsAI && currentTurn === "O") {
+    setTimeout(aiMove, 500);
+  }
 }
 
-// Gewinner überprüfen
 function checkWinner() {
   const winPatterns = [
-    [0, 1, 2], [3, 4, 5], [6, 7, 8],  // Reihen
-    [0, 3, 6], [1, 4, 7], [2, 5, 8],  // Spalten
-    [0, 4, 8], [2, 4, 6]              // Diagonalen
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
   ];
 
   for (const [a, b, c] of winPatterns) {
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      return { winner: board[a], pattern: [a, b, c] };
+      cells[a].classList.add(`win-${board[a].toLowerCase()}`);
+      cells[b].classList.add(`win-${board[a].toLowerCase()}`);
+      cells[c].classList.add(`win-${board[a].toLowerCase()}`);
+      statusEl.innerText = `${board[a]} gewinnt!`;
+      return true;
     }
   }
 
-  return null;
+  if (!board.includes("")) {
+    statusEl.innerText = "Unentschieden!";
+    return true;
+  }
+
+  return false;
 }
 
-// Klick auf Zelle
+function handleMove(index) {
+  if (board[index] === "" && currentTurn === mySymbol) {
+    board[index] = mySymbol;
+    updateBoard();
+    socket.emit("move", { room, index, symbol: mySymbol });
+    if (!checkWinner()) switchTurn();
+  }
+}
+
 cells.forEach((cell, i) => {
   cell.addEventListener("click", () => {
-    if (board[i] === "" && currentTurn === mySymbol) {
-      board[i] = mySymbol;
-      updateBoard();
-      socket.emit("move", { room, index: i, symbol: mySymbol });
-
-      const result = checkWinner();
-      if (result) {
-        highlightWinner(result.winner, result.pattern);
-        statusEl.innerText = `Spieler ${result.winner} hat gewonnen!`;
-        return;
+    if (isVsAI) {
+      if (board[i] === "" && currentTurn === "X") {
+        board[i] = "X";
+        updateBoard();
+        if (!checkWinner()) {
+          currentTurn = "O";
+          setTimeout(aiMove, 500);
+        }
       }
-
-      switchTurn();
+    } else {
+      handleMove(i);
     }
   });
 });
 
-// Gewinner farblich hervorheben
-function highlightWinner(winner, pattern) {
-  pattern.forEach(i => {
-    cells[i].classList.add(winner === "X" ? "win-x" : "win-o");
-  });
-}
-
-// Neustart
 restartBtn.addEventListener("click", () => {
   board = Array(9).fill("");
   updateBoard();
@@ -81,44 +87,41 @@ restartBtn.addEventListener("click", () => {
   socket.emit("restart", room);
 });
 
-// Raum beitreten
 joinBtn.addEventListener("click", () => {
   const roomCode = roomInput.value.trim();
   if (roomCode) {
+    isVsAI = false;
     room = roomCode;
     socket.emit("joinRoom", room);
   }
 });
 
-// Neues Spiel erstellen
 createBtn.addEventListener("click", () => {
+  isVsAI = false;
   room = Math.random().toString(36).substring(2, 8).toUpperCase();
   roomInput.value = room;
   socket.emit("joinRoom", room);
 });
 
-// Socket.IO: Startsignal
+vsAiBtn.addEventListener("click", () => {
+  isVsAI = true;
+  board = Array(9).fill("");
+  currentTurn = "X";
+  updateBoard();
+  statusEl.innerText = "Du spielst gegen die KI als X";
+});
+
 socket.on("start", (symbol) => {
   mySymbol = symbol;
   statusEl.innerText = `Du spielst: ${mySymbol}`;
 });
 
-// Gegnerzug empfangen
 socket.on("move", ({ index, symbol }) => {
   board[index] = symbol;
   updateBoard();
-
-  const result = checkWinner();
-  if (result) {
-    highlightWinner(result.winner, result.pattern);
-    statusEl.innerText = `Spieler ${result.winner} hat gewonnen!`;
-    return;
-  }
-
-  switchTurn();
+  if (!checkWinner()) switchTurn();
 });
 
-// Spiel zurückgesetzt
 socket.on("restart", () => {
   board = Array(9).fill("");
   updateBoard();
@@ -126,45 +129,15 @@ socket.on("restart", () => {
   statusEl.innerText = `Du spielst: ${mySymbol}`;
 });
 
-let playAgainstAI = false;
-
-document.getElementById("playAI").addEventListener("click", () => {
-  playAgainstAI = true;
-  board = Array(9).fill("");
-  updateBoard();
-  currentTurn = "X";
-  mySymbol = "X";
-  statusEl.innerText = `Du spielst gegen KI als ${mySymbol}`;
-});
-
-// einfache KI, wählt zufälliges freies Feld
 function aiMove() {
-  const emptyIndices = board
-    .map((val, idx) => val === "" ? idx : null)
-    .filter(idx => idx !== null);
-  if (emptyIndices.length === 0) return;
-  const move = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-  board[move] = "O";
+  let emptyIndices = board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+  if (emptyIndices.length === 0 || checkWinner()) return;
+
+  const randomIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+  board[randomIndex] = "O";
   updateBoard();
-  checkWinner();
-  switchTurn();
+
+  if (!checkWinner()) {
+    currentTurn = "X";
+  }
 }
-
-// Spielzug ausführen
-cells.forEach((cell, i) => {
-  cell.addEventListener("click", () => {
-    if (board[i] === "" && currentTurn === mySymbol) {
-      board[i] = mySymbol;
-      updateBoard();
-      checkWinner();
-      if (playAgainstAI) {
-        switchTurn();
-        setTimeout(aiMove, 500);
-      } else {
-        socket.emit("move", { room, index: i, symbol: mySymbol });
-        switchTurn();
-      }
-    }
-  });
-});
-
