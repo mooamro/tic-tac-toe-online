@@ -125,3 +125,46 @@ socket.on("restart", () => {
   currentTurn = "X";
   statusEl.innerText = `Du spielst: ${mySymbol}`;
 });
+
+let playAgainstAI = false;
+
+document.getElementById("playAI").addEventListener("click", () => {
+  playAgainstAI = true;
+  board = Array(9).fill("");
+  updateBoard();
+  currentTurn = "X";
+  mySymbol = "X";
+  statusEl.innerText = `Du spielst gegen KI als ${mySymbol}`;
+});
+
+// einfache KI, wählt zufälliges freies Feld
+function aiMove() {
+  const emptyIndices = board
+    .map((val, idx) => val === "" ? idx : null)
+    .filter(idx => idx !== null);
+  if (emptyIndices.length === 0) return;
+  const move = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+  board[move] = "O";
+  updateBoard();
+  checkWinner();
+  switchTurn();
+}
+
+// Spielzug ausführen
+cells.forEach((cell, i) => {
+  cell.addEventListener("click", () => {
+    if (board[i] === "" && currentTurn === mySymbol) {
+      board[i] = mySymbol;
+      updateBoard();
+      checkWinner();
+      if (playAgainstAI) {
+        switchTurn();
+        setTimeout(aiMove, 500);
+      } else {
+        socket.emit("move", { room, index: i, symbol: mySymbol });
+        switchTurn();
+      }
+    }
+  });
+});
+
