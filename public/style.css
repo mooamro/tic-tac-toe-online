@@ -1,3 +1,49 @@
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  overflow: hidden; /* prevent scrollbars from falling X/O */
+  height: 100vh;
+  position: relative;
+  background-color: #111; /* fallback dark bg */
+  color: white;
+}
+
+.background-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.background-animation span {
+  position: absolute;
+  top: -10%;
+  font-size: 4rem;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.05);
+  animation: floatXO 12s linear infinite;
+  user-select: none;
+}
+
+@keyframes floatXO {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.05;
+  }
+  100% {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0.1;
+  }
+}
+
+
 /* GLOBAL STYLES */
 html {
   background: #111;
