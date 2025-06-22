@@ -4,31 +4,33 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tic Tac Toe Online</title>
+
+  <!-- Google Font for fancy name -->
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- Background X/O Animation -->
-  <div class="background-animation" id="xo-background">
-    <!-- Dynamically filled by JavaScript (optional) -->
-    <span style="left: 10%; animation-delay: 0s;">X</span>
-    <span style="left: 30%; animation-delay: 2s;">O</span>
-    <span style="left: 50%; animation-delay: 4s;">X</span>
-    <span style="left: 70%; animation-delay: 1s;">O</span>
-    <span style="left: 90%; animation-delay: 3s;">X</span>
+  <!-- Animated Background Pattern -->
+  <div class="background-logo-pattern">
+    <!-- Repeat name across screen (JS could also generate this dynamically) -->
+    <span>mo.amro</span><span>mo.amro</span><span>mo.amro</span><span>mo.amro</span><span>mo.amro</span>
+    <span>mo.amro</span><span>mo.amro</span><span>mo.amro</span><span>mo.amro</span><span>mo.amro</span>
+    <span>mo.amro</span><span>mo.amro</span><span>mo.amro</span><span>mo.amro</span><span>mo.amro</span>
+    <span>mo.amro</span><span>mo.amro</span><span>mo.amro</span><span>mo.amro</span><span>mo.amro</span>
   </div>
 
   <!-- Game Title -->
   <h1>Tic Tac Toe Online</h1>
 
-  <!-- Join/Create Controls -->
+  <!-- Room Controls -->
   <div id="controls">
     <input id="roomInput" placeholder="Raumcode eingeben" />
     <button id="joinBtn">Beitreten</button>
     <button id="createBtn">Neues Spiel erstellen</button>
   </div>
 
-  <!-- Status Message -->
+  <!-- Status Output -->
   <div id="status">Warte auf Verbindung...</div>
 
   <!-- Game Board -->
@@ -47,12 +49,8 @@
   <!-- Restart Button -->
   <button id="restartBtn">Neustarten</button>
 
-  <!-- Optional Room Link -->
-  <div id="link-display"></div>
-
-  <!-- Socket.IO and Game Script -->
+  <!-- Socket.IO & Game Logic -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="main.js"></script>
-
 </body>
 </html>
