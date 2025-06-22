@@ -1,23 +1,69 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Arial', sans-serif;
-  min-height: 100vh;
-
-  /* Background image */
-  background-image: url('palestine-flag_121354613.jpg');
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-
-  box-sizing: border-box;
+.background-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.15;
 }
+
+.xo {
+  position: absolute;
+  font-size: 10vw;
+  font-weight: bold;
+  animation: float 20s linear infinite;
+  opacity: 0.5;
+  user-select: none;
+}
+
+.xo1 {
+  top: 10%;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.xo2 {
+  top: 30%;
+  left: 70%;
+  animation-delay: 3s;
+}
+
+.xo3 {
+  top: 50%;
+  left: 40%;
+  animation-delay: 6s;
+}
+
+.xo4 {
+  top: 70%;
+  left: 10%;
+  animation-delay: 9s;
+}
+
+.xo5 {
+  top: 85%;
+  left: 80%;
+  animation-delay: 12s;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-50px) rotate(180deg);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(0) rotate(360deg);
+    opacity: 0.3;
+  }
+}
+
 
 
 
