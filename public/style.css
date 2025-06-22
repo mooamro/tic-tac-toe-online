@@ -1,98 +1,96 @@
+/* Import fancy font */
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+
+/* Background pattern */
 body {
   margin: 0;
   font-family: 'Arial', sans-serif;
-  overflow: hidden; /* prevent scrollbars from falling X/O */
+  background-color: #111;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
   height: 100vh;
-  position: relative;
-  background-color: #111; /* fallback dark bg */
   color: white;
+  position: relative;
 }
 
-.background-animation {
+/* Animated name background */
+.background-logo-pattern {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   z-index: -1;
-  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  opacity: 0.04;
+  font-family: 'Great Vibes', cursive;
+  font-size: 3rem;
+  color: white;
   pointer-events: none;
 }
 
-.background-animation span {
-  position: absolute;
-  top: -10%;
-  font-size: 4rem;
-  font-weight: bold;
-  color: rgba(255, 255, 255, 0.05);
-  animation: floatXO 12s linear infinite;
-  user-select: none;
+.background-logo-pattern span {
+  width: 120px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: floatText 40s linear infinite;
 }
 
-@keyframes floatXO {
+@keyframes floatText {
   0% {
-    transform: translateY(-10vh) rotate(0deg);
-    opacity: 0.1;
-  }
-  50% {
-    opacity: 0.05;
+    transform: translateY(0) rotate(0deg);
   }
   100% {
-    transform: translateY(110vh) rotate(360deg);
-    opacity: 0.1;
+    transform: translateY(-100vh) rotate(360deg);
   }
 }
 
-
-/* GLOBAL STYLES */
-html {
-  background: #111;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  margin: 0;
-  font-family: 'Arial', sans-serif;
-  background-color: transparent;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  min-height: 100vh;
-  position: relative;
-  z-index: 0;
-  overflow: hidden;
-}
-
-/* TITLE */
+/* Heading */
 h1 {
   margin: 10px;
-  color: #ffffff;
-  z-index: 1;
+  color: #fff;
 }
 
-/* CONTROLS */
+/* Control buttons and input */
 #controls {
   margin-top: 10px;
-  z-index: 1;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 #controls input,
 #controls button {
-  margin: 5px;
   padding: 10px;
   font-size: 1em;
+  border-radius: 5px;
+  border: none;
 }
 
-/* BOARD */
+#controls button {
+  background-color: #0077cc;
+  color: white;
+  cursor: pointer;
+}
+
+#controls button:hover {
+  background-color: #005fa3;
+}
+
+/* Game board */
 #board {
   display: grid;
   grid-template-columns: repeat(3, 100px);
   grid-template-rows: repeat(3, 100px);
   gap: 5px;
   margin: 20px 0;
-  z-index: 1;
 }
 
 .cell {
@@ -104,14 +102,9 @@ h1 {
   font-size: 48px;
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.3s ease;
 }
 
-.cell:hover {
-  background-color: #ddd;
-}
-
-/* CELL COLORS */
 .cell.x {
   color: black;
   font-weight: bold;
@@ -122,7 +115,6 @@ h1 {
   font-weight: bold;
 }
 
-/* WIN STYLES */
 .cell.win-x {
   background-color: black;
   color: white;
@@ -133,14 +125,18 @@ h1 {
   color: white;
 }
 
-/* STATUS + BUTTONS */
+.cell:hover {
+  background-color: #ddd;
+}
+
+/* Status text */
 #status {
   font-size: 1.2em;
   margin: 10px;
-  color: #ffffff;
-  z-index: 1;
+  color: #ccc;
 }
 
+/* Restart button */
 #restartBtn {
   padding: 10px 20px;
   font-size: 1em;
@@ -149,58 +145,13 @@ h1 {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  z-index: 1;
 }
 
 #restartBtn:hover {
   background-color: #005fa3;
 }
 
-/* ROOM LINK */
-#link-display {
-  margin-top: 10px;
-  color: #ccc;
-  font-style: italic;
-  z-index: 1;
-}
-
-/* BACKGROUND ANIMATION */
-.background-animation {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.1;
-}
-
-/* X/O ANIMATION STYLES */
-.background-animation span {
-  position: absolute;
-  font-size: 3em;
-  font-weight: bold;
-  color: rgba(255, 255, 255, 0.1);
-  animation: floatXO 15s linear infinite;
-}
-
-@keyframes floatXO {
-  0% {
-    transform: translateY(100vh) rotate(0deg);
-    opacity: 0;
-  }
-  20% {
-    opacity: 0.3;
-  }
-  100% {
-    transform: translateY(-100vh) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-/* RESPONSIVE */
+/* Responsive */
 @media (max-width: 600px) {
   #board {
     grid-template-columns: repeat(3, 80px);
