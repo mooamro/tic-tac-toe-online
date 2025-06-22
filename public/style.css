@@ -1,16 +1,21 @@
 body {
   margin: 0;
+  padding: 0;
   font-family: 'Arial', sans-serif;
+  min-height: 100vh;
+
+  /* Background image */
   background-image: url('palestine-flag_121354613.jpg');
-  background-size: cover;              /* covers the whole screen */
-  background-position: center center;  /* centers the image */
-  background-repeat: no-repeat;        /* avoids repeating */
-  background-attachment: fixed;        /* stays in place on scroll */
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
-  min-height: 100vh;                   /* ensures full height on phones */
+  justify-content: flex-start;
+
   box-sizing: border-box;
 }
 
