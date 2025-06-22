@@ -66,13 +66,13 @@ function aiMove() {
 }
 
 function findBestMove() {
-  // 1. Block player (X) from winning
-  let blockingMove = findWinningMove("X");
-  if (blockingMove !== -1) return blockingMove;
-
-  // 2. Try to win (O)
+  // 1. Try to win (O)
   let winningMove = findWinningMove("O");
   if (winningMove !== -1) return winningMove;
+
+  // 2. Block player (X) from winning
+  let blockingMove = findWinningMove("X");
+  if (blockingMove !== -1) return blockingMove;
 
   // 3. Take center if available
   if (board[4] === "") return 4;
