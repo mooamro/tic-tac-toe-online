@@ -4,138 +4,126 @@ let mySymbol = "";
 let currentTurn = "X";
 let board = Array(9).fill("");
 let room = "";
-let vsAi = false;
-let gameEnded = false;
+let isVsBot = false;
 
 const cells = document.querySelectorAll(".cell");
 const statusEl = document.getElementById("status");
 const restartBtn = document.getElementById("restartBtn");
 const joinBtn = document.getElementById("joinBtn");
 const createBtn = document.getElementById("createBtn");
-const aiBtn = document.getElementById("vsAiBtn");
 const roomInput = document.getElementById("roomInput");
+const botBtn = document.getElementById("botBtn");
 
-// Aktualisiert das Board visuell
+// Spielfeld aktualisieren
 function updateBoard() {
   board.forEach((symbol, i) => {
     cells[i].innerText = symbol;
-    cells[i].className = "cell"; // reset classes
+    cells[i].classList.remove("x", "o", "win-x", "win-o");
     if (symbol === "X") cells[i].classList.add("x");
     if (symbol === "O") cells[i].classList.add("o");
   });
 }
 
-// Spieler wechselt
-function switchTurn() {
-  currentTurn = currentTurn === "X" ? "O" : "X";
-}
-
-// Klick-Event für Zellen
-cells.forEach((cell, i) => {
-  cell.addEventListener("click", () => {
-    if (gameEnded || board[i] !== "") return;
-
-    if (vsAi && currentTurn === "X") {
-      board[i] = "X";
-      updateBoard();
-      if (checkWinner()) return;
-      currentTurn = "O";
-      setTimeout(aiMove, 500);
-    }
-
-    if (!vsAi && currentTurn === mySymbol) {
-      board[i] = mySymbol;
-      updateBoard();
-      socket.emit("move", { room, index: i, symbol: mySymbol });
-      if (checkWinner()) return;
-      switchTurn();
-    }
-  });
-});
-
-// KI-Zug
-function aiMove() {
-  const empty = board
-    .map((val, idx) => val === "" ? idx : null)
-    .filter(i => i !== null);
-
-  if (empty.length === 0) return;
-
-  const index = empty[Math.floor(Math.random() * empty.length)];
-  board[index] = "O";
-  updateBoard();
-  if (checkWinner()) return;
-  currentTurn = "X";
-}
-
-// Restart-Klick
-restartBtn.addEventListener("click", () => {
-  board = Array(9).fill("");
-  updateBoard();
-  currentTurn = "X";
-  gameEnded = false;
-  if (!vsAi) socket.emit("restart", room);
-  statusEl.innerText = vsAi ? "Du spielst gegen die KI. Du bist X." : `Du spielst: ${mySymbol}`;
-});
-
-// Multiplayer-Raum beitreten
-joinBtn.addEventListener("click", () => {
-  const roomCode = roomInput.value.trim();
-  if (roomCode) {
-    vsAi = false;
-    room = roomCode;
-    socket.emit("joinRoom", room);
-  }
-});
-
-// Raum erstellen
-createBtn.addEventListener("click", () => {
-  vsAi = false;
-  room = Math.random().toString(36).substring(2, 8).toUpperCase();
-  roomInput.value = room;
-  socket.emit("joinRoom", room);
-});
-
-// Gegen KI spielen
-aiBtn.addEventListener("click", () => {
-  vsAi = true;
-  board = Array(9).fill("");
-  updateBoard();
-  currentTurn = "X";
-  gameEnded = false;
-  statusEl.innerText = "Du spielst gegen die KI. Du bist X.";
-});
-
 // Gewinner prüfen
 function checkWinner() {
-  const lines = [
-    [0,1,2],[3,4,5],[6,7,8], // rows
-    [0,3,6],[1,4,7],[2,5,8], // cols
-    [0,4,8],[2,4,6]          // diagonals
+  const winCombos = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
   ];
 
-  for (let line of lines) {
-    const [a,b,c] = line;
+  for (let combo of winCombos) {
+    const [a, b, c] = combo;
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      cells[a].classList.add(board[a] === "X" ? "win-x" : "win-o");
-      cells[b].classList.add(board[a] === "X" ? "win-x" : "win-o");
-      cells[c].classList.add(board[a] === "X" ? "win-x" : "win-o");
-      statusEl.innerText = `Spieler ${board[a]} gewinnt!`;
-      gameEnded = true;
+      combo.forEach(i => {
+        cells[i].classList.add(`win-${board[a].toLowerCase()}`);
+      });
+      statusEl.innerText = `${board[a]} hat gewonnen!`;
       return true;
     }
   }
 
   if (!board.includes("")) {
     statusEl.innerText = "Unentschieden!";
-    gameEnded = true;
     return true;
   }
 
   return false;
 }
 
-// Multiplayer-Events
+// Spielerwechsel
+function switchTurn() {
+  currentTurn = currentTurn === "X" ? "O" : "X";
+  statusEl.innerText = `Du spielst: ${mySymbol}`;
+}
+
+// Spieler klickt auf eine Zelle
+cells.forEach((cell, i) => {
+  cell.addEventListener("click", () => {
+    if (board[i] === "" && currentTurn === mySymbol) {
+      board[i] = mySymbol;
+      updateBoard();
+      if (checkWinner()) return;
+
+      if (isVsBot) {
+        switchTurn();
+        setTimeout(() => botMove(), 500);
+      } else {
+        socket.emit("move", { room, index: i, symbol: mySymbol });
+        switchTurn();
+      }
+    }
+  });
+});
+
+// Neustart
+restartBtn.addEventListener("click", () => {
+  board = Array(9).fill("");
+  updateBoard();
+  currentTurn = "X";
+  statusEl.innerText = `Du spielst: ${mySymbol}`;
+  if (!isVsBot) socket.emit("restart", room);
+});
+
+// Bot-Spiel starten
+botBtn.addEventListener("click", () => {
+  isVsBot = true;
+  mySymbol = "X";
+  board = Array(9).fill("");
+  updateBoard();
+  currentTurn = "X";
+  statusEl.innerText = "Du spielst: X (vs KI)";
+});
+
+// Bot macht zufälligen Zug
+function botMove() {
+  const empty = board.map((val, i) => val === "" ? i : null).filter(v => v !== null);
+  if (empty.length === 0 || checkWinner()) return;
+  const randIndex = empty[Math.floor(Math.random() * empty.length)];
+  board[randIndex] = "O";
+  updateBoard();
+  checkWinner();
+  switchTurn();
+}
+
+// Socket.IO Multiplayer
+joinBtn.addEventListener("click", () => {
+  const roomCode = roomInput.value.trim();
+  if (roomCode) {
+    isVsBot = false;
+    room = roomCode;
+    socket.emit("joinRoom", room);
+  }
+});
+
+createBtn.addEventListener("click", () => {
+  isVsBot = false;
+  room = Math.random().toString(36).substring(2, 8).toUpperCase();
+  roomInput.value = room;
+  socket.emit("joinRoom", room);
+});
+
+// Multiplayer Events
 socket.on("start", (symbol) => {
   mySymbol = symbol;
   statusEl.innerText = `Du spielst: ${mySymbol}`;
@@ -152,6 +140,5 @@ socket.on("restart", () => {
   board = Array(9).fill("");
   updateBoard();
   currentTurn = "X";
-  gameEnded = false;
   statusEl.innerText = `Du spielst: ${mySymbol}`;
 });
