@@ -1,43 +1,102 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tic Tac Toe – Rundenwahl</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #111;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 30px;
+    }
+
+    .rounds {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .round-btn {
+      background: #333;
+      color: white;
+      padding: 15px 25px;
+      border: 2px solid white;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.2em;
+      transition: 0.2s ease;
+    }
+
+    .round-btn:hover, .round-btn.selected {
+      background: white;
+      color: #111;
+    }
+
+    #okBtn {
+      padding: 12px 24px;
+      font-size: 1.1em;
+      background-color: green;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+    }
+
+    #modeToggle {
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Tic Tac Toe</h1>
-  <h2>Wie viele Runden möchtest du spielen?</h2>
+  <h1>Wie viele Runden willst du spielen?</h1>
 
-  <div class="round-selection">
-    <button onclick="startGame(1)">1 Runde</button>
-    <button onclick="startGame(3)">3 Runden</button>
-    <button onclick="startGame(5)">5 Runden</button>
-    <button onclick="startGame(7)">7 Runden</button>
+  <div id="modeToggle">
+    <label><input type="radio" name="mode" value="ai" checked> Gegen KI</label>
+    <label><input type="radio" name="mode" value="online"> Online</label>
   </div>
 
-  <div style="margin-top: 20px;">
-    <button onclick="playWithAI()">Gegen KI spielen</button>
-    <button onclick="playOnline()">Online spielen</button>
+  <div class="rounds">
+    <button class="round-btn" data-rounds="1">1</button>
+    <button class="round-btn" data-rounds="3">3</button>
+    <button class="round-btn" data-rounds="5">5</button>
+    <button class="round-btn" data-rounds="7">7</button>
   </div>
+
+  <button id="okBtn">OK</button>
 
   <script>
-    function startGame(rounds) {
-      localStorage.setItem("rounds", rounds);
-      localStorage.setItem("playerWins", 0);
-      localStorage.setItem("aiWins", 0);
-    }
+    const roundButtons = document.querySelectorAll('.round-btn');
+    const okBtn = document.getElementById('okBtn');
+    let selectedRounds = null;
 
-    function playWithAI() {
-      const rounds = localStorage.getItem("rounds") || 1;
-      window.location.href = "game.html?mode=ai&rounds=" + rounds;
-    }
+    roundButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        roundButtons.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedRounds = btn.dataset.rounds;
+        okBtn.style.display = 'inline-block';
+      });
+    });
 
-    function playOnline() {
-      const rounds = localStorage.getItem("rounds") || 1;
-      window.location.href = "game.html?mode=online&rounds=" + rounds;
-    }
+    okBtn.addEventListener('click', () => {
+      const mode = document.querySelector('input[name="mode"]:checked').value;
+      if (selectedRounds && mode) {
+        window.location.href = `game.html?mode=${mode}&rounds=${selectedRounds}`;
+      }
+    });
   </script>
 </body>
 </html>
