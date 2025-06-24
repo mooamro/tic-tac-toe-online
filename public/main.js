@@ -1,3 +1,22 @@
+// Auslesen von URL-Parametern
+const params = new URLSearchParams(window.location.search);
+const mode = params.get("mode");       // "ai" oder "online"
+const totalRounds = parseInt(params.get("rounds")) || 1;
+
+let currentRound = 1;
+let playerScore = 0;
+let aiScore = 0;
+
+// Nach jeder Runde:
+function checkGameEnd() {
+  if (currentRound >= totalRounds) {
+    alert(`Spiel beendet! Ergebnis:\nSpieler: ${playerScore} | KI: ${aiScore}`);
+    window.location.href = "index.html"; // Zurück zur Startseite
+  } else {
+    currentRound++;
+    restartGame();
+  }
+}
 const socket = io();
 
 let mySymbol = "";
