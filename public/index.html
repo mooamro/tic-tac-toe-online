@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe – Rundenwahl</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Tic Tac Toe</h1>
+  <h2>Wie viele Runden möchtest du spielen?</h2>
+
+  <div class="round-selection">
+    <button onclick="startGame(1)">1 Runde</button>
+    <button onclick="startGame(3)">3 Runden</button>
+    <button onclick="startGame(5)">5 Runden</button>
+    <button onclick="startGame(7)">7 Runden</button>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <button onclick="playWithAI()">Gegen KI spielen</button>
+    <button onclick="playOnline()">Online spielen</button>
+  </div>
+
+  <script>
+    function startGame(rounds) {
+      localStorage.setItem("rounds", rounds);
+      localStorage.setItem("playerWins", 0);
+      localStorage.setItem("aiWins", 0);
+    }
+
+    function playWithAI() {
+      const rounds = localStorage.getItem("rounds") || 1;
+      window.location.href = "game.html?mode=ai&rounds=" + rounds;
+    }
+
+    function playOnline() {
+      const rounds = localStorage.getItem("rounds") || 1;
+      window.location.href = "game.html?mode=online&rounds=" + rounds;
+    }
+  </script>
+</body>
+</html>
