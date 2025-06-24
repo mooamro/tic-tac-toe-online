@@ -67,9 +67,16 @@ function checkWinner() {
   }
 
   if (!board.includes("")) {
-    statusEl.innerText = "Unentschieden!";
-    setTimeout(checkGameEnd, 1500);
-    return "draw";
+statusEl.innerText = "Unentschieden! Diese Runde wird nicht gezählt.";
+setTimeout(() => {
+  board = Array(9).fill("");
+  currentTurn = "X";
+  updateBoard();
+  statusEl.innerText = `Du spielst: ${mySymbol}`;
+  if (isAgainstAI && mySymbol === "O") setTimeout(aiMove, 400);
+}, 1500);
+return "draw";
+
   }
 
   return null;
