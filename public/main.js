@@ -1,3 +1,18 @@
+let xWins = 0;
+let oWins = 0;
+let currentRound = 1;
+let totalRounds = 1; // wird später durch URL-Parameter ersetzt
+
+const xScoreEl = document.getElementById("x-score");
+const oScoreEl = document.getElementById("o-score");
+const roundCounterEl = document.getElementById("round-counter");
+
+// Funktion zur Anzeige aktualisieren
+function updateScores() {
+  xScoreEl.textContent = `X: ${xWins}`;
+  oScoreEl.textContent = `O: ${oWins}`;
+  roundCounterEl.textContent = `Runde ${currentRound}`;
+}
 // Auslesen von URL-Parametern
 const params = new URLSearchParams(window.location.search);
 const mode = params.get("mode");       // "ai" oder "online"
