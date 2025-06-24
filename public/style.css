@@ -191,3 +191,12 @@ h1 {
     padding: 8px;
   }
 }
+
+#rounds-info {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+  font-size: 1.2em;
+  color: white;
+}
+
